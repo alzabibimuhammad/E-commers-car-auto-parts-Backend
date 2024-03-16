@@ -18,9 +18,12 @@ class SaleController extends Controller
     //done
     public function buy(Request $req){
         $customer_id=$req->input('id');
+
         $customer_financial_balance=User::where('id',$customer_id)->get();
+
         $finalPriceForAllparts=0;
         $carts=Cart::all()->where('customer_id',$customer_id);
+
         $checkMonyBeforeBuying=0;
         //checkMonyBeforeBuying
         foreach ($carts as $cart){
@@ -59,10 +62,10 @@ class SaleController extends Controller
                 $finalPriceForAllparts+=$cart->totalprice;
 
                 //Mails for sellers
-                $data1 = [
-                    'subject'=>"The auto part ID: ('".$cart->part_id."') has been purchased and the price of ('".$cart->totalprice."') has been added to your profites",
-                ];
-                $mailForCustomer = Mail::to($preProfits[0]->email)->send(new RejectionNotification($data1));
+                // $data1 = [
+                //     'subject'=>"The auto part ID: ('".$cart->part_id."') has been purchased and the price of ('".$cart->totalprice."') has been added to your profites",
+                // ];
+                // $mailForCustomer = Mail::to($preProfits[0]->email)->send(new RejectionNotification($data1));
 
                 //deleted cart
                 $delete_cart = Cart::find($cart->id);
@@ -72,10 +75,10 @@ class SaleController extends Controller
                 return response()->json(["Balance is not good"],500);
             }
 
-            $data = [
-                'subject'=>"Purchase successfully completed for an price of '".$finalPriceForAllparts."' ",
-            ];
-            $mailForCustomer = Mail::to($customer_financial_balance[0]->email)->send(new RejectionNotification($data));
+            // $data = [
+            //     'subject'=>"Purchase successfully completed for an price of '".$finalPriceForAllparts."' ",
+            // ];
+            // $mailForCustomer = Mail::to($customer_financial_balance[0]->email)->send(new RejectionNotification($data));
 
             return response()->json("The Order is Done");
         }
@@ -175,7 +178,7 @@ class SaleController extends Controller
         for ($i=0;$i<count($price);$i++){
             $totalSalesMony+=$price [$i]->totalprice;
         }
-        return response()->json($totalSalesMony);
+        return response()->json("hi");
     }
 
     //show total mony for customer prushes

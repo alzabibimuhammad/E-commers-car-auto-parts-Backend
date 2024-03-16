@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\Car;
 use App\Models\User;
 use App\Models\Part;
+use App\Models\CarType;
 use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
@@ -36,6 +37,7 @@ class CartController extends Controller
         else{
             $checkMonyBeforeAddingToCart+=($getPart[0]->price * $amount);
         }
+        // return $checkMonyBeforeAddingToCart;
         //end checking mony
     if($checkMonyBeforeAddingToCart <= $customer[0]->financial_balance){
         if ($existingCart) {
@@ -81,8 +83,16 @@ class CartController extends Controller
     function ShowCart($id){
         $showcart=Cart::where('customer_id',$id)->with('category')->with('part')->with('seller')->with('customer')->get();
         foreach($showcart as $cart){
-            $model=Car::where('id',$cart->car_id)->get('model');
-            $cart->car_model=$model[0]->model;
+            $seller_name = User::where('id',$cart->seller_id)->get('name');
+            $model=Car::where('id',$cart->car_id)->get();
+            $type_name=CarType::where('id',$model[0]->type_id)->get('type');
+            $part = Part::where('id',$cart->part_id)->get();
+
+            $cart->type=$type_name[0]->type;
+            $cart->model_id=$model[0]->model;
+            $cart->seller_name = $seller_name[0]->name;
+            $cart->name = $part[0]->name;
+            $cart->image = $part[0]->image;
         }
         $showcart = $showcart->filter(function ($cart) {
             if($cart->part==null){
@@ -91,7 +101,15 @@ class CartController extends Controller
             }
             return $cart->part !== null;
         });
-        return array($showcart);
+
+        $totalCartPrice = 0 ;
+        for ($i=0;$i<count($showcart);$i++){
+            $totalCartPrice+=$showcart[$i]->totalprice;
+        }
+
+        return response()->json(['cart'=>$showcart,'total'=>$totalCartPrice], 200);
+
+
     }
     //done
     function finalPrice($id){
