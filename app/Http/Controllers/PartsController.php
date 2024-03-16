@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RejectionNotification;
 use Illuminate\Support\Facades\File;
+use App\Models\User;
 
 
 class PartsController extends Controller
@@ -75,7 +76,7 @@ class PartsController extends Controller
         if($delete)
             return response()->json("Deleted");
         else
-            return response()->json("Error");
+            return response()->json("Error",400);
         }
 
     //done
@@ -84,7 +85,7 @@ class PartsController extends Controller
         if($undeletePart)
             return response()->json("Successfully Restored");
         else
-            return response()->json("Error");
+            return response()->json("Error",400);
 
     }
     //done
@@ -93,7 +94,7 @@ class PartsController extends Controller
         if($deleteAllParts)
             return response()->json(['Deleted'],200);
         else
-            return response()->json(['Error'],200);
+            return response()->json(['Error'],400);
     }
     //done
     function UnDeleteAllParts($id){
@@ -101,7 +102,7 @@ class PartsController extends Controller
         if($deleteAllParts)
             return response()->json(['Restored'],200);
         else
-            return response()->json(['Error'],200);
+            return response()->json(['Error'],400);
     }
 
     //done show
@@ -140,81 +141,18 @@ class PartsController extends Controller
     }
     //done
     function carParts(Request $request){
-        $array = array();
-        if($request->input('category')==null & $request->input('model') == null & $request->input('carType')==null ){
             $data=Part::where('deleted_at')->with('seller')->with('category')->get();
             foreach($data as $dat){
+                $seller_name = User::where('id',$dat->seller_id)->get('name');
                 $type_id=Car::where('id',$dat->model_id)->get('type_id');
                 $type_name=CarType::where('id',$type_id[0]->type_id)->get('type');
                 $dat->type=$type_name[0]->type;
                 $model_name=Car::where('id',$dat->model_id)->get('model');
                 $dat->model_id=$model_name[0]->model;
+                $dat->seller_name = $seller_name[0]->name;
             }
-            return response()->json(array($data));
-        }
-        elseif($request->input('category')==null & $request->input('model') == null & $request->input('carType')!=null){
-            $model_id = Car::where('type_id',$request->input('carType'))->get('id');
-            foreach($model_id as $id){
-                $data=Part::where('deleted_at')->where('model_id',$id->id)->with('seller')->with('category')->get();
-                foreach($data as $dat){
-                    $type_id=Car::where('id',$dat->model_id)->get('type_id');
-                    $type_name=CarType::where('id',$type_id[0]->type_id)->get('type');
-                    $dat->type=$type_name[0]->type;
-                    $model_name=Car::where('id',$dat->model_id)->get('model');
-                    $dat->model_id=$model_name[0]->model;
-                }
-                array_push($array,$data);
-            }
-            return response()->json($array);
-        }
-        elseif($request->input('category') == null & $request->input('model')!=null){
-            $data=Part::where('deleted_at')->where('model_id',$request->input('model'))->with('seller')->with('category')->get();
-            foreach($data as $dat){
-                $type_id=Car::where('id',$dat->model_id)->get('type_id');
-                $type_name=CarType::where('id',$type_id[0]->type_id)->get('type');
-                $dat->type=$type_name[0]->type;
-                $model_name=Car::where('id',$dat->model_id)->get('model');
-                $dat->model_id=$model_name[0]->model;
-            }
-            return response()->json(array($data));
-        }
-        elseif($request->input('category') != null & $request->input('model')==null & $request->input('carType')==null){
-            $data=Part::where('deleted_at')->where('category_id',$request->input('category'))->with('seller')->with('category')->get();
-            foreach($data as $dat){
-                $type_id=Car::where('id',$dat->model_id)->get('type_id');
-                $type_name=CarType::where('id',$type_id[0]->type_id)->get('type');
-                $dat->type=$type_name[0]->type;
-                $model_name=Car::where('id',$dat->model_id)->get('model');
-                $dat->model_id=$model_name[0]->model;
-            }
-            return response()->json(array($data));
-        }
-        elseif($request->input('category') != null & $request->input('model')!=null){
-            $data=Part::where('deleted_at')->where('category_id',$request->input('category'))->where('model_id',$request->input('model'))->with('seller')->with('category')->get();
-            foreach($data as $dat){
-                $type_id=Car::where('id',$dat->model_id)->get('type_id');
-                $type_name=CarType::where('id',$type_id[0]->type_id)->get('type');
-                $dat->type=$type_name[0]->type;
-                $model_name=Car::where('id',$dat->model_id)->get('model');
-                $dat->model_id=$model_name[0]->model;
-            }
-            return response()->json(array($data));
-        }
-        elseif($request->input('category') != null &$request->input('carType')!=null ){
-            $model_id = Car::where('type_id',$request->input('carType'))->get('id');
-            foreach($model_id as $id){
-                $data=Part::where('deleted_at')->where('model_id',$id->id)->where('category_id',$request->input('category'))->with('seller')->with('category')->get();
-                foreach($data as $dat){
-                    $type_id=Car::where('id',$dat->model_id)->get('type_id');
-                    $type_name=CarType::where('id',$type_id[0]->type_id)->get('type');
-                    $dat->type=$type_name[0]->type;
-                    $model_name=Car::where('id',$dat->model_id)->get('model');
-                    $dat->model_id=$model_name[0]->model;
-                }
-                array_push($array,$data);
-            }
-            return response()->json($array);
-        }
+            return response()->json($data);
+
     }
     //done
     function PartDetails($id){

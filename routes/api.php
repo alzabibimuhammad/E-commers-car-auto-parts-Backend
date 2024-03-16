@@ -300,7 +300,7 @@ Route::get('carParts',[PartsController::class , 'carParts']);
 // Route::get('buy', [SaleController::class, 'buy']);
 
 
-Route::get('deleteProfileCustomerSellerAPI/{id}', [Users::class, 'deleteProfile']);
+Route::delete('deleteProfileCustomerSellerAPI/{id}', [Users::class, 'deleteProfile']);
 
 Route::post('updateProfile', [Users::class, 'updateProfile']);
 
@@ -314,15 +314,15 @@ Route::get('showparts', [PartsController::class, 'showParts']);
 
 
 //add to cart
-Route::get('AddToCart', [CartController::class, 'AddToCart']);
+Route::post('AddToCart', [CartController::class, 'AddToCart']);
 //show cart
 Route::get('ShowCart/{id}', [CartController::class, 'ShowCart'])->name('show.cart');
 
 //delete from cart
-Route::get('deletefromcart/{id}', [CartController::class, 'DeleteFromCart']);
+Route::delete('deletefromcart/{id}', [CartController::class, 'DeleteFromCart']);
 
 //delete all cart
-Route::get('DeleteAllCart/{id}', [CartController::class, 'DeleteAllCart']);
+Route::delete('DeleteAllCart/{id}', [CartController::class, 'DeleteAllCart']);
 
 
 
@@ -365,15 +365,15 @@ Route::get('showDeletedPart/{id}', [PartsController::class, 'showDeletedPart']);
 
 
 //delete part
-Route::get('deletePart/{id}', [PartsController::class, 'deletePart']);
+Route::delete('deletePart/{id}', [PartsController::class, 'deletePart']);
 
 
 //undelete part
-Route::get('unDeletedPart/{id}', [PartsController::class, 'unDeletedPart']);
+Route::put('unDeletedPart/{id}', [PartsController::class, 'unDeletedPart']);
 
 
-Route::get('DeleteAllParts/{id}', [PartsController::class, 'DeleteAllParts']);
-Route::get('UnDeleteAllParts/{id}', [PartsController::class, 'UnDeleteAllParts']);
+Route::delete('DeleteAllParts/{id}', [PartsController::class, 'DeleteAllParts']);
+Route::put('UnDeleteAllParts/{id}', [PartsController::class, 'UnDeleteAllParts']);
 
 
 

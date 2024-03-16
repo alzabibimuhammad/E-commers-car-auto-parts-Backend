@@ -15,7 +15,7 @@ class Users extends Controller
 {
     function updateProfile(Request $req){
         $data = $req->all();
-        if($req->input('password') != 'undefined'){
+        if($req->input('password') != ''){
             $data['password']=Hash::make($req->input('password'));
         }
         else{
@@ -23,7 +23,6 @@ class Users extends Controller
         }
         $image = $req->file('image');
         $profile = User::where('id',$data['id'])->get();
-
         if ($image && $image->isValid()) {
             $imageName = time().'.'.$image->getClientOriginalExtension();
             $path=$image->move(public_path('users'), $imageName);
@@ -33,6 +32,7 @@ class Users extends Controller
                 File::delete($filePath);
             $data['image']='users/'.$imageName;
         }
+
         unset($data['id']);
         $update_user_backup=user_backup::where('email',$profile[0]->email)->update($data);
         $update=User::where('id', $req->input('id'))->update($data);
@@ -53,9 +53,9 @@ class Users extends Controller
             File::delete($filePath);
         $delete=$profile->delete();
         if($delete)
-            return response()->json("Deleted");
+            return response()->json("Deleted",200);
         else
-            return response()->json("Error");
+            return response()->json("Error",200);
         }
     //done
     function showProfile($id){
